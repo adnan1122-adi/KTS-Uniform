@@ -1,11 +1,13 @@
 
 export const SCHOOL_NAME = "Knowledge Towers School (KTS)";
-export const PRIMARY_BLUE = "#1E3A8A";
+export const PRIMARY_BLUE = "#23a463";
 
 // The Google Apps Script Web App URL for backend operations
-export const API_BASE_URL = "https://script.google.com/macros/s/AKfycbw8H_mX8stGX6MLFxlxMuI-aHjfGwMm0-a2UPoANKynTXVS3i5NxUgjDlKDLqTBmb9m/exec";
+export const API_BASE_URL = "https://script.google.com/macros/s/AKfycbz-s5ts_3d6tj3pmbL3tDsM2fCaRAxVPTgvQh6iIple50L8j-7lxw3BHl3zsPpDDe1A/exec";
 
-export const UNIFORM_SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+export const GREEN_UNIFORM_SIZES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', '12', '14', '16', '18', '20', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+export const BEIGE_PANT_SIZES = ['2', '3', '4', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50'];
+export const SKORT_SIZES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', '12', '14', '16', '18', '20'];
 
 export const GRADES = [
   'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',

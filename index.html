@@ -6,6 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowledge Towers School - Uniform Request</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              blue: {
+                50: '#f0f9f4',
+                100: '#dcf0e5',
+                200: '#bbe1cc',
+                300: '#8ecba9',
+                400: '#5bab81',
+                500: '#3d8e64',
+                600: '#23a463', // School Primary
+                700: '#238253',
+                800: '#1f6745',
+                900: '#1a553a',
+                950: '#0e2f20',
+              }
+            },
+            boxShadow: {
+              'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            }
+          }
+        }
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -23,10 +49,12 @@
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <div id="root"></div>
     <!-- Load the main React entry point -->
     <script type="module" src="./index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>

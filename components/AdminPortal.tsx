@@ -6,7 +6,7 @@ import {
   Lock, Search, Loader2, AlertCircle, RefreshCw, LogOut, MessageSquare, 
   LayoutList, Save, CheckCircle, BarChart3, ToggleLeft, ToggleRight, UserCog
 } from 'lucide-react';
-import { PRIMARY_BLUE, UNIFORM_SIZES } from '../constants';
+import { PRIMARY_BLUE, GREEN_UNIFORM_SIZES, BEIGE_PANT_SIZES, SKORT_SIZES } from '../constants';
 
 const AdminPortal: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -140,15 +140,24 @@ const AdminPortal: React.FC = () => {
                   <tr key={req.row} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-900">{req.englishName}</div>
-                      <div className="text-xs text-gray-400">{req.studentId} • {req.grade}</div>
+                      <div className="text-xs text-gray-400">{req.studentId} • {req.grade} • {req.gender}</div>
+                      <div className="text-[10px] text-gray-500 mt-1">Parent: {req.parentName} • {req.mobileNo}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-md text-[10px] font-bold ${req.requestStatus === 'ModificationRequested' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
                         {req.requestStatus === 'ModificationRequested' ? 'EDIT ACCESS NEEDED' : 'NEW SUBMISSION'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-700">
-                      S:{req.shirt} T:{req.trousers} J:{req.jacket}
+                    <td className="px-6 py-4 text-[10px] font-bold text-gray-700">
+                      <div className="grid grid-cols-2 gap-x-2">
+                        {req.greenHoodie && <span>Hoodie: {req.greenHoodie}</span>}
+                        {req.greenPant && <span>Pant: {req.greenPant}</span>}
+                        {req.greenPolo && <span>Polo: {req.greenPolo}</span>}
+                        {req.whiteTshirt && <span>T-Shirt: {req.whiteTshirt}</span>}
+                        {req.beigePant && <span>Beige: {req.beigePant}</span>}
+                        {req.skort && <span>Skort: {req.skort}</span>}
+                      </div>
+                      {req.notes && <div className="mt-1 text-gray-400 italic font-normal">Notes: {req.notes}</div>}
                     </td>
                     <td className="px-6 py-4 text-right">
                       {req.requestStatus === 'ModificationRequested' ? (
@@ -170,22 +179,25 @@ const AdminPortal: React.FC = () => {
       )}
 
       {activeTab === AdminTab.SUMMARY && summary && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-soft">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-soft space-y-8">
            <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-blue-600" /> Inventory Summary</h3>
-           <table className="w-full text-center">
-             <thead>
-               <tr className="bg-gray-50 text-xs text-gray-500 uppercase font-bold"><th className="px-4 py-3 text-left">Uniform Item</th>{UNIFORM_SIZES.map(s => <th key={s}>{s}</th>)}<th className="bg-blue-50">Total</th></tr>
-             </thead>
-             <tbody className="font-bold divide-y">
-               {['shirt', 'trousers', 'jacket'].map(type => (
-                 <tr key={type} className="hover:bg-gray-50/30">
-                   <td className="px-4 py-4 text-left capitalize font-bold text-gray-900">{type}</td>
-                   {UNIFORM_SIZES.map(s => <td key={s} className="text-gray-600">{summary[type as keyof SizeSummary][s] || 0}</td>)}
-                   <td className="bg-blue-50 text-blue-700">{Object.values(summary[type as keyof SizeSummary]).reduce((a: any, b: any) => a + b, 0)}</td>
-                 </tr>
-               ))}
-             </tbody>
-           </table>
+           {Object.entries(summary).map(([item, sizes]) => (
+             <div key={item} className="space-y-3">
+               <h4 className="font-bold text-gray-900 capitalize border-b pb-2">{item.replace(/([A-Z])/g, ' $1')}</h4>
+               <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                 {Object.entries(sizes as Record<string, number>).map(([size, count]) => (
+                   <div key={size} className="bg-gray-50 p-2 rounded-lg text-center">
+                     <div className="text-[10px] text-gray-400 font-bold">{size}</div>
+                     <div className="text-sm font-black text-blue-600">{count}</div>
+                   </div>
+                 ))}
+                 <div className="bg-blue-50 p-2 rounded-lg text-center border border-blue-100">
+                   <div className="text-[10px] text-blue-400 font-bold uppercase">Total</div>
+                   <div className="text-sm font-black text-blue-700">{Object.values(sizes as Record<string, number>).reduce((a, b) => a + b, 0)}</div>
+                 </div>
+               </div>
+             </div>
+           ))}
         </div>
       )}
 

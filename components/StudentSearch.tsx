@@ -33,7 +33,7 @@ const StudentSearch: React.FC<StudentSearchProps> = ({ onSearch, isLoading }) =>
           <input
             type="text"
             className="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-gray-50/50"
-            placeholder="Enter Student ID (e.g., KTS-2024-001)"
+            placeholder="Enter Student ID/Iqama"
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
             disabled={isLoading}

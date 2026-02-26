@@ -69,12 +69,17 @@ export const searchStudent = async (studentId: string): Promise<StudentInfo | nu
     return {
       studentId: data.studentId.toString(),
       englishName: data.englishName || "",
-      arabicName: data.arabicName || "",
       grade: data.grade || "",
-      className: data.class || "",
-      existingShirt: data.shirt || "",
-      existingTrousers: data.trousers || "",
-      existingJacket: data.jacket || "",
+      gender: data.gender || "",
+      parentName: data.parentName || "",
+      mobileNo: data.mobileNo || "",
+      greenHoodie: data.greenHoodie || "",
+      greenPant: data.greenPant || "",
+      greenPolo: data.greenPolo || "",
+      whiteTshirt: data.whiteTshirt || "",
+      beigePant: data.beigePant || "",
+      skort: data.skort || "",
+      notes: data.notes || "",
       status: data.status || ""
     };
   }
@@ -112,7 +117,7 @@ export const submitRequest = async (student: StudentInfo, request: UniformReques
 export const fetchAdminRequests = async (password: string): Promise<AdminRequestRow[]> => {
   const data = await safeFetch(`${API_BASE_URL}?action=admin&password=${encodeURIComponent(password)}`);
   if (!Array.isArray(data)) return [];
-  return data.map((item: any) => ({ ...item, className: item.class || "" }));
+  return data;
 };
 
 export const approveRequest = async (row: number, password: string): Promise<boolean> => {

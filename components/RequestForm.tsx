@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { StudentInfo, UniformRequest, UniformSize, AppMessage } from '../types';
-import { UNIFORM_SIZES, PRIMARY_BLUE } from '../constants';
-import { User, ClipboardList, CheckCircle2, AlertCircle, Loader2, Edit3, Hourglass, RefreshCw, LogOut } from 'lucide-react';
+import { StudentInfo, UniformRequest, AppMessage } from '../types';
+import { GREEN_UNIFORM_SIZES, BEIGE_PANT_SIZES, SKORT_SIZES, PRIMARY_BLUE } from '../constants';
+import { User, ClipboardList, CheckCircle2, AlertCircle, Loader2, Edit3, Hourglass, RefreshCw, LogOut, Phone, UserCircle } from 'lucide-react';
 import { requestModification, searchStudent } from '../services/api';
 
 interface RequestFormProps {
@@ -18,9 +18,6 @@ interface RequestFormProps {
 const RequestForm: React.FC<RequestFormProps> = ({ 
   student, onSubmit, isSubmitting, status, config, onReset, onModificationSuccess 
 }) => {
-  // Logic: 
-  // 1. If student has NO status (new), allow editing immediately.
-  // 2. If student has status 'Modifiable', allow editing immediately.
   const canEditDirectly = !student.status || student.status === 'Modifiable';
   
   const [isModifying, setIsModifying] = useState(canEditDirectly);
@@ -28,11 +25,34 @@ const RequestForm: React.FC<RequestFormProps> = ({
   const [modError, setModError] = useState<string | null>(null);
   
   const [form, setForm] = useState<UniformRequest>({
-    shirt: (student.existingShirt as UniformSize) || '',
-    trousers: (student.existingTrousers as UniformSize) || '',
-    jacket: (student.existingJacket as UniformSize) || '',
-    notes: ''
+    parentName: student.parentName || '',
+    mobileNo: student.mobileNo || '',
+    greenHoodie: student.greenHoodie || '',
+    greenPant: student.greenPant || '',
+    greenPolo: student.greenPolo || '',
+    whiteTshirt: student.whiteTshirt || '',
+    beigePant: student.beigePant || '',
+    skort: student.skort || '',
+    notes: student.notes || ''
   });
+
+  // Helper to check grade range
+  const isGradeInRange = (grade: string, start: string, end: string) => {
+    const grades = [
+      'KG1', 'KG2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
+      'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'
+    ];
+    const startIndex = grades.indexOf(start);
+    const endIndex = grades.indexOf(end);
+    const currentIndex = grades.indexOf(grade);
+    
+    if (startIndex === -1 || currentIndex === -1) return false;
+    if (endIndex === -1) return currentIndex >= startIndex;
+    return currentIndex >= startIndex && currentIndex <= endIndex;
+  };
+
+  const isGirlPrimary = student.gender === 'بنات' && isGradeInRange(student.grade, 'KG2', 'Grade 5');
+  const isBoyAll = student.gender === 'بنين' && isGradeInRange(student.grade, 'KG1', 'Grade 12');
 
   const handleModRequest = async () => {
     setModReqLoading(true);
@@ -62,9 +82,9 @@ const RequestForm: React.FC<RequestFormProps> = ({
     }
   };
 
-  const hasExistingData = !!(student.existingShirt || student.existingTrousers || student.existingJacket);
-  const approvalRequired = config.modification === 'enabled';
-  const isWaitState = approvalRequired && student.status === 'ModificationRequested';
+  const hasExistingData = !!(student.greenHoodie || student.greenPant || student.greenPolo || student.whiteTshirt);
+  const approvalRequired = config.modification === 'disabled';
+  const isWaitState = student.status === 'ModificationRequested';
   const showReadOnly = hasExistingData && !isModifying && student.status !== 'Modifiable';
 
   if (status === 'success') {
@@ -74,7 +94,11 @@ const RequestForm: React.FC<RequestFormProps> = ({
           <CheckCircle2 className="h-10 w-10 text-green-500" />
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Request Saved!</h3>
-        <p className="text-gray-600 mb-8 max-w-md mx-auto">Your uniform sizes have been submitted for review. Thank you.</p>
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          {student.status === 'Modifiable' 
+            ? "Your modified sizes have been submitted for final approval. Thank you." 
+            : "Your uniform sizes have been submitted. Thank you."}
+        </p>
         <button 
           onClick={onReset} 
           className="px-8 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
@@ -106,19 +130,19 @@ const RequestForm: React.FC<RequestFormProps> = ({
           )}
         </div>
         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Name (English)</p><p className="text-lg font-bold text-gray-900">{student.englishName}</p></div>
-          <div className="text-right font-arabic" dir="rtl"><p className="text-xs font-bold text-gray-400 uppercase tracking-widest" dir="ltr">الاسم (عربي)</p><p className="text-lg font-bold text-gray-900">{student.arabicName}</p></div>
-          <div><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Class Information</p><p className="text-gray-700 font-medium">{student.grade} - {student.className}</p></div>
-          <div className="text-right"><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Student ID</p><p className="text-gray-700 font-medium">{student.studentId}</p></div>
+          <div><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Student Name</p><p className="text-lg font-bold text-gray-900">{student.englishName}</p></div>
+          <div className="text-right"><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Student ID</p><p className="text-lg font-bold text-gray-900">{student.studentId}</p></div>
+          <div><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Grade</p><p className="text-gray-700 font-medium">{student.grade}</p></div>
+          <div className="text-right"><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Gender</p><p className="text-gray-700 font-medium">{student.gender}</p></div>
         </div>
       </div>
 
       {isWaitState ? (
         <div className="bg-white rounded-2xl shadow-soft p-12 border border-amber-100 text-center space-y-4">
            <Hourglass className="h-12 w-12 text-amber-500 mx-auto animate-pulse" />
-           <h3 className="text-xl font-bold text-gray-900">Staff Approval Required</h3>
+           <h3 className="text-xl font-bold text-gray-900">Modification Request Pending</h3>
            <p className="text-gray-600 max-w-md mx-auto font-medium">
-             You have requested to change your uniform sizes. This is currently being reviewed by school staff.
+             Your request to modify sizes is being reviewed. Please wait 24H for modification approval.
            </p>
            <div className="pt-4 flex flex-col items-center gap-3">
              <button onClick={handleRefresh} disabled={modReqLoading} className="flex items-center gap-2 px-6 py-2 bg-amber-50 text-amber-700 rounded-xl font-bold border border-amber-200">
@@ -143,10 +167,13 @@ const RequestForm: React.FC<RequestFormProps> = ({
              </button>
           </div>
           {modError && <div className="p-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold flex items-center gap-2"><AlertCircle className="h-4 w-4" /> {modError}</div>}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Shirt</p><p className="text-2xl font-black text-gray-900">{student.existingShirt || '-'}</p></div>
-            <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Trousers</p><p className="text-2xl font-black text-gray-900">{student.existingTrousers || '-'}</p></div>
-            <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Jacket</p><p className="text-2xl font-black text-gray-900">{student.existingJacket || '-'}</p></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {student.greenHoodie && <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Hoodie</p><p className="text-xl font-black text-gray-900">{student.greenHoodie}</p></div>}
+            {student.greenPant && <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Pant</p><p className="text-xl font-black text-gray-900">{student.greenPant}</p></div>}
+            {student.greenPolo && <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Polo</p><p className="text-xl font-black text-gray-900">{student.greenPolo}</p></div>}
+            {student.whiteTshirt && <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">T-Shirt</p><p className="text-xl font-black text-gray-900">{student.whiteTshirt}</p></div>}
+            {student.beigePant && <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Beige Pant</p><p className="text-xl font-black text-gray-900">{student.beigePant}</p></div>}
+            {student.skort && <div className="p-4 bg-gray-50 rounded-xl text-center"><p className="text-[10px] text-gray-400 font-bold uppercase">Skort</p><p className="text-xl font-black text-gray-900">{student.skort}</p></div>}
           </div>
           <div className="pt-2 text-center">
              <button onClick={onReset} className="text-gray-400 text-sm font-bold hover:text-gray-600">Back to Search</button>
@@ -158,23 +185,127 @@ const RequestForm: React.FC<RequestFormProps> = ({
             <ClipboardList className="h-6 w-6 text-blue-600" />
             <h2 className="text-xl font-bold text-gray-900">Uniform Size Selection</h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(['shirt', 'trousers', 'jacket'] as const).map((item) => (
-              <div key={item} className="space-y-2">
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">{item}</label>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <UserCircle className="h-3 w-3" /> Parent Name
+              </label>
+              <input 
+                type="text"
+                required
+                placeholder="Enter parent full name"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                value={form.parentName}
+                onChange={(e) => setForm(f => ({ ...f, parentName: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <Phone className="h-3 w-3" /> Mobile Number
+              </label>
+              <input 
+                type="tel"
+                required
+                placeholder="05xxxxxxxx"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                value={form.mobileNo}
+                onChange={(e) => setForm(f => ({ ...f, mobileNo: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          {!(isGirlPrimary || isBoyAll) ? (
+            <div className="p-6 bg-amber-50 border border-amber-100 rounded-2xl text-amber-800 text-center">
+              <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="font-bold">No uniform selection available for this grade/gender combination.</p>
+              <p className="text-sm mt-1">Please contact the school administration for assistance.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Green Hoodie</label>
                 <select 
-                  value={form[item]} 
-                  onChange={(e) => setForm(f => ({ ...f, [item]: e.target.value as UniformSize }))}
+                  value={form.greenHoodie} 
+                  onChange={(e) => setForm(f => ({ ...f, greenHoodie: e.target.value }))}
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   required
                 >
                   <option value="">Select Size</option>
-                  {UNIFORM_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                  {GREEN_UNIFORM_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
-            ))}
-          </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Green Pant</label>
+                <select 
+                  value={form.greenPant} 
+                  onChange={(e) => setForm(f => ({ ...f, greenPant: e.target.value }))}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  required
+                >
+                  <option value="">Select Size</option>
+                  {GREEN_UNIFORM_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Green Polo</label>
+                <select 
+                  value={form.greenPolo} 
+                  onChange={(e) => setForm(f => ({ ...f, greenPolo: e.target.value }))}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  required
+                >
+                  <option value="">Select Size</option>
+                  {GREEN_UNIFORM_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">White T-Shirt</label>
+                <select 
+                  value={form.whiteTshirt} 
+                  onChange={(e) => setForm(f => ({ ...f, whiteTshirt: e.target.value }))}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  required
+                >
+                  <option value="">Select Size</option>
+                  {GREEN_UNIFORM_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              {isBoyAll && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Beige Pant</label>
+                  <select 
+                    value={form.beigePant} 
+                    onChange={(e) => setForm(f => ({ ...f, beigePant: e.target.value }))}
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    required
+                  >
+                    <option value="">Select Size</option>
+                    {BEIGE_PANT_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {isGirlPrimary && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Skort</label>
+                  <select 
+                    value={form.skort} 
+                    onChange={(e) => setForm(f => ({ ...f, skort: e.target.value }))}
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    required
+                  >
+                    <option value="">Select Size</option>
+                    {SKORT_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
           
           <div className="space-y-2">
             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Additional Notes</label>
@@ -187,7 +318,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
           
           <div className="flex flex-col gap-4">
             <button 
-              type="submit" disabled={isSubmitting}
+              type="submit" disabled={isSubmitting || !(isGirlPrimary || isBoyAll)}
               style={{ backgroundColor: PRIMARY_BLUE }}
               className="w-full py-4 text-white font-bold rounded-xl shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-50"
             >
