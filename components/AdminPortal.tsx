@@ -210,10 +210,10 @@ const AdminPortal: React.FC = () => {
             </div>
             <button 
               onClick={() => setSchoolMessage(p => ({ ...p, modification: p.modification === 'enabled' ? 'disabled' : 'enabled' }))}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold border transition-all ${schoolMessage.modification === 'enabled' ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm' : 'bg-green-50 text-green-700 border-green-200'}`}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold border transition-all ${schoolMessage.modification === 'disabled' ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm' : 'bg-green-50 text-green-700 border-green-200'}`}
             >
-              {schoolMessage.modification === 'enabled' ? <ToggleRight className="h-6 w-6" /> : <ToggleLeft className="h-6 w-6" />}
-              Staff Approval Required for Changes: <span className="uppercase">{schoolMessage.modification === 'enabled' ? 'ON' : 'OFF'}</span>
+              {schoolMessage.modification === 'disabled' ? <ToggleRight className="h-6 w-6" /> : <ToggleLeft className="h-6 w-6" />}
+              Staff Approval Required for Changes: <span className="uppercase">{schoolMessage.modification === 'disabled' ? 'ON' : 'OFF'}</span>
             </button>
           </div>
           

@@ -23,6 +23,11 @@ const RequestForm: React.FC<RequestFormProps> = ({
   const [isModifying, setIsModifying] = useState(canEditDirectly);
   const [modReqLoading, setModReqLoading] = useState(false);
   const [modError, setModError] = useState<string | null>(null);
+
+  // Sync isModifying when student data changes (e.g., after search or refresh)
+  React.useEffect(() => {
+    setIsModifying(!student.status || student.status === 'Modifiable');
+  }, [student.status, student.studentId]);
   
   const [form, setForm] = useState<UniformRequest>({
     parentName: student.parentName || '',
@@ -51,8 +56,9 @@ const RequestForm: React.FC<RequestFormProps> = ({
     return currentIndex >= startIndex && currentIndex <= endIndex;
   };
 
-  const isGirlPrimary = student.gender === 'بنات' && isGradeInRange(student.grade, 'KG2', 'Grade 5');
-  const isBoyAll = student.gender === 'بنين' && isGradeInRange(student.grade, 'KG1', 'Grade 12');
+  const showSkort = student.gender === 'بنات' && isGradeInRange(student.grade, 'KG1', 'Grade 4');
+  const showBeigePant = (student.gender === 'بنين' && isGradeInRange(student.grade, 'KG1', 'Grade 12')) || 
+                        (student.gender === 'بنات' && isGradeInRange(student.grade, 'Grade 5', 'Grade 12'));
 
   const handleModRequest = async () => {
     setModReqLoading(true);
@@ -82,10 +88,10 @@ const RequestForm: React.FC<RequestFormProps> = ({
     }
   };
 
-  const hasExistingData = !!(student.greenHoodie || student.greenPant || student.greenPolo || student.whiteTshirt);
+  const hasExistingData = !!(student.greenHoodie || student.greenPant || student.greenPolo || student.whiteTshirt || student.beigePant || student.skort);
   const approvalRequired = config.modification === 'disabled';
-  const isWaitState = student.status === 'ModificationRequested';
-  const showReadOnly = hasExistingData && !isModifying && student.status !== 'Modifiable';
+  const isWaitState = student.status === 'ModificationRequested' || student.status === 'Pending';
+  const showReadOnly = hasExistingData && !isModifying && !isWaitState && student.status !== 'Modifiable';
 
   if (status === 'success') {
     return (
@@ -125,7 +131,8 @@ const RequestForm: React.FC<RequestFormProps> = ({
               'bg-amber-100 text-amber-700'
             }`}>
               {student.status === 'ModificationRequested' ? 'Status: Pending Approval' : 
-               student.status === 'Modifiable' ? 'Status: Ready to Modify' : `Status: ${student.status}`}
+               student.status === 'Modifiable' ? 'Status: Ready to Modify' : 
+               student.status === 'Pending' ? 'Status: Awaiting Final Approval' : `Status: ${student.status}`}
             </span>
           )}
         </div>
@@ -140,9 +147,13 @@ const RequestForm: React.FC<RequestFormProps> = ({
       {isWaitState ? (
         <div className="bg-white rounded-2xl shadow-soft p-12 border border-amber-100 text-center space-y-4">
            <Hourglass className="h-12 w-12 text-amber-500 mx-auto animate-pulse" />
-           <h3 className="text-xl font-bold text-gray-900">Modification Request Pending</h3>
+           <h3 className="text-xl font-bold text-gray-900">
+             {student.status === 'Pending' ? 'Final Approval Pending' : 'Modification Request Pending'}
+           </h3>
            <p className="text-gray-600 max-w-md mx-auto font-medium">
-             Your request to modify sizes is being reviewed. Please wait 24H for modification approval.
+             {student.status === 'Pending' 
+               ? "Your updated sizes have been submitted. Please wait for staff to review and approve."
+               : "Your request to modify sizes is being reviewed. Please wait 24H for modification approval."}
            </p>
            <div className="pt-4 flex flex-col items-center gap-3">
              <button onClick={handleRefresh} disabled={modReqLoading} className="flex items-center gap-2 px-6 py-2 bg-amber-50 text-amber-700 rounded-xl font-bold border border-amber-200">
@@ -215,7 +226,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
             </div>
           </div>
 
-          {!(isGirlPrimary || isBoyAll) ? (
+          {!(showSkort || showBeigePant) ? (
             <div className="p-6 bg-amber-50 border border-amber-100 rounded-2xl text-amber-800 text-center">
               <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="font-bold">No uniform selection available for this grade/gender combination.</p>
@@ -275,7 +286,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
                 </select>
               </div>
 
-              {isBoyAll && (
+              {showBeigePant && (
                 <div className="space-y-2">
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Beige Pant</label>
                   <select 
@@ -290,7 +301,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
                 </div>
               )}
 
-              {isGirlPrimary && (
+              {showSkort && (
                 <div className="space-y-2">
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Skort</label>
                   <select 
@@ -318,7 +329,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
           
           <div className="flex flex-col gap-4">
             <button 
-              type="submit" disabled={isSubmitting || !(isGirlPrimary || isBoyAll)}
+              type="submit" disabled={isSubmitting || !(showSkort || showBeigePant)}
               style={{ backgroundColor: PRIMARY_BLUE }}
               className="w-full py-4 text-white font-bold rounded-xl shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-50"
             >
