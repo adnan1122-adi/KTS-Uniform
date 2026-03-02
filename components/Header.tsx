@@ -17,7 +17,7 @@ const Header: React.FC = () => {
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
               {SCHOOL_NAME}
             </h1>
-            <p className="text-gray-500 text-sm font-medium">Uniform Size Request System 2026</p>
+            <p className="text-gray-500 text-sm font-medium">Uniform Size Request System 2026-2027</p>
           </div>
         </div>
       </div>
