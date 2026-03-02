@@ -101,9 +101,9 @@ const RequestForm: React.FC<RequestFormProps> = ({
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Request Saved!</h3>
         <p className="text-gray-600 mb-8 max-w-md mx-auto">
-          {student.status === 'Modifiable' 
+          {student.status === 'Modifiable' && config.modification === 'disabled'
             ? "Your modified sizes have been submitted for final approval. Thank you." 
-            : "Your uniform sizes have been submitted. Thank you."}
+            : "Your uniform sizes have been submitted successfully. Thank you."}
         </p>
         <button 
           onClick={onReset} 
