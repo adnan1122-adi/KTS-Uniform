@@ -1,6 +1,6 @@
 
 export const SCHOOL_NAME = "Knowledge Towers School (KTS)";
-export const PRIMARY_BLUE = "#23a463";
+export const PRIMARY_BLUE = "#24a464";
 
 // The Google Apps Script Web App URL for backend operations
 export const API_BASE_URL = "https://script.google.com/macros/s/AKfycbwvIo0sZR_IPgqFW4UWRR2UiPGCEVBDgk-8k82rMgQ67u83By_FYVi29XdQa8iuM1Hz/exec";
